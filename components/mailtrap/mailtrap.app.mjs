@@ -7,7 +7,7 @@ export default {
     domainId: {
       type: "string",
       label: "Domain",
-      description: "A sending domain verified in your Mailtrap account.",
+      description: "A sending domain verified in your Mailtrap account (numeric domain ID, e.g. `831941`).",
       async options() {
         const { data: domains } = await this.listDomains({});
         return domains.map(({
@@ -21,15 +21,36 @@ export default {
     suppressionId: {
       type: "string",
       label: "Suppression",
-      description: "A suppressed email address to remove from the suppression list.",
-      async options() {
-        const suppressions = await this.listSuppressions({});
-        return suppressions.map(({
+      description:
+        "The suppression ID to remove from the suppression list (associated with the email address.)," +
+        " e.g. `25bac214-6fce-4939-bee3-abcdc8f982a8`.",
+      async options({ prevContext }) {
+        const { lastId } = prevContext ?? {};
+        const suppressions = await this.listSuppressions({
+          params: {
+            ...(lastId && {
+              last_id: lastId,
+            }),
+          },
+        });
+        const options = suppressions.map(({
           id, email,
         }) => ({
           label: email,
           value: id,
         }));
+        const isFullPage = suppressions.length === 1000;
+        if (!isFullPage) {
+          return {
+            options,
+          };
+        }
+        return {
+          options,
+          context: {
+            lastId: suppressions[suppressions.length - 1].id,
+          },
+        };
       },
     },
   },

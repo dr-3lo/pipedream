@@ -86,6 +86,14 @@ export default {
       description: "File reference(s) to attach.",
       optional: true,
     },
+    syncDir: {
+      type: "dir",
+      label: "Sync Directory",
+      description: "Read-only directory where file references are synchronized before execution.",
+      accessMode: "read",
+      sync: true,
+      optional: true,
+    },
     attachmentsBase64: {
       type: "string[]",
       label: "Base64 Attachments",
