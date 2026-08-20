@@ -1,15 +1,19 @@
-// Full smoke test: sends an email, then polls its delivery state.
-// Run from the mailtrap component root:
+// Full smoke test: sends an email, polls its delivery state, and exercises the
+// read-only domains/suppressions actions. Run from the mailtrap component root:
 //
 //   MAILTRAP_API_TOKEN=xxx \
 //   MAILTRAP_FROM_EMAIL=sender@yourdomain.com \
 //   MAILTRAP_TO_EMAIL=you@example.com \
 //   node .vscode/tests/run-all.test.mjs
 //
+// create-suppression and delete-suppression are intentionally NOT chained
+// here — they mutate account state. Run their own test files when needed.
 // As new actions are added, chain their test functions here too.
 
 import { testSendEmail } from "./send-email.test.mjs";
 import { testGetEmailState } from "./get-email-state.test.mjs";
+import { testListDomains } from "./list-domains.test.mjs";
+import { testListSuppressions } from "./list-suppressions.test.mjs";
 import {
   requireEnv, wait,
 } from "./_shared.mjs";
@@ -21,6 +25,9 @@ requireEnv([
 ]);
 
 async function main() {
+  await testListDomains();
+  await testListSuppressions();
+
   const sendResponse = await testSendEmail();
   const messageId = sendResponse?.message_ids?.[0];
 

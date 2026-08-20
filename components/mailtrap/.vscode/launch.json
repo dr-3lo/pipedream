@@ -30,6 +30,58 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Debug: list-domains",
+      "runtimeExecutable": "node",
+      "program": "${workspaceFolder}/.vscode/tests/list-domains.test.mjs",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug: list-suppressions",
+      "runtimeExecutable": "node",
+      "program": "${workspaceFolder}/.vscode/tests/list-suppressions.test.mjs",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug: create-suppression",
+      "runtimeExecutable": "node",
+      "program": "${workspaceFolder}/.vscode/tests/create-suppression.test.mjs",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug: delete-suppression",
+      "runtimeExecutable": "node",
+      "program": "${workspaceFolder}/.vscode/tests/delete-suppression.test.mjs",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Debug: run-all",
       "runtimeExecutable": "node",
       "program": "${workspaceFolder}/.vscode/tests/run-all.test.mjs",
