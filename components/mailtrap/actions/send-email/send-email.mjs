@@ -6,12 +6,28 @@ import {
 // 10 MB limits for Mailtrap API
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const MAX_TOTAL_ATTACHMENTS_SIZE_BYTES = 10 * 1024 * 1024;
+const BASE64_PATTERN = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
+// Computes the exact decoded byte size from a validated Base64 string's length,
+// without allocating the decoded buffer.
+function getBase64DecodedSize(content) {
+  const padding = content.endsWith("==")
+    ? 2
+    : content.endsWith("=")
+      ? 1
+      : 0;
+  return (content.length / 4) * 3 - padding;
+}
 
 export default {
   name: "Send Email",
   description:
-    "Send a transactional email [See the documentation]" +
-    "(https://docs.mailtrap.io/developers/email-sending/transactional#post-api-send)",
+    "Send a transactional email, optionally with attachments." +
+    " Use **File** references (a `/tmp` path or a URL) for files already accessible to the workflow," +
+    " or **Base64 Attachments** for inline content constructed at runtime — `base64AttachmentFilenames`" +
+    " must be the same length and in the same order as `attachmentsBase64`." +
+    " Each attachment is limited to 10 MB, and the total across all attachments is also capped at 10 MB." +
+    " [See the documentation](https://docs.mailtrap.io/developers/email-sending/transactional#post-api-send)",
   key: "mailtrap-send-email",
   version: "0.0.1",
   annotations: {
@@ -97,7 +113,7 @@ export default {
     attachmentsBase64: {
       type: "string[]",
       label: "Base64 Attachments",
-      description: "Base64-encoded file content(s), e.g., ['SGVsbG8='].",
+      description: "Base64-encoded file content(s), e.g. `[\"SGVsbG8=\"]`.",
       optional: true,
     },
     base64AttachmentFilenames: {
@@ -240,7 +256,12 @@ export default {
       for (let i = 0; i < attachmentsBase64.length; i++) {
         const content = attachmentsBase64[i];
         const filename = base64AttachmentFilenames[i];
-        const decodedSize = Buffer.byteLength(content, "base64");
+
+        if (!BASE64_PATTERN.test(content)) {
+          throw new ConfigurationError(`Base64 attachment "${filename}" is invalid.`);
+        }
+
+        const decodedSize = getBase64DecodedSize(content);
 
         if (decodedSize > MAX_FILE_SIZE_BYTES) {
           throw new ConfigurationError(
